@@ -3,11 +3,12 @@ package com.devbaktiyarov.employee_web_db.controller;
 import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.devbaktiyarov.employee_web_db.entity.Employee;
@@ -15,7 +16,8 @@ import com.devbaktiyarov.employee_web_db.repository.EmployeeRepository;
 
 
 @RestController
-@RequestMapping("/api")
+@CrossOrigin(origins = "http://127.0.0.1:5500")
+@RequestMapping("/api/employees")
 public class EmoployeeController {
 
     private final EmployeeRepository employeeRepository;
@@ -25,32 +27,17 @@ public class EmoployeeController {
     }
 
     @PostMapping
-    public ResponseEntity<String> createEmployee(
-            @RequestParam String fullname,
-            @RequestParam String username,
-            @RequestParam String email,
-            @RequestParam String phoneNumber,
-            @RequestParam String password,
-            @RequestParam String confirmPassword
-            ) {
-    
-        Employee employee = new Employee();
-        employee.setFullname(fullname);
-        employee.setUsername(username);
-        employee.setEmail(email);
-        employee.setPhoneNumber(phoneNumber);
-        employee.setPassword(password);
-        employee.setConfirmPassword(confirmPassword);
+    public ResponseEntity<Employee> createEmployee(@RequestBody Employee employee) {
+        // Сохранение объекта в базе данных
+        Employee savedEmployee = employeeRepository.save(employee);
 
-        employeeRepository.save(employee);
-
-        return ResponseEntity.ok("Ok");       
-
+        // Возвращение ответа с сохраненным объектом и статусом 201 Created
+        return ResponseEntity.status(201).body(savedEmployee);
     }
 
 
     @GetMapping("/{id}")
-    // http://localhost:8080/api/1
+    // http://localhost:8080/api/employees/1
     public ResponseEntity<Employee> getEmployee(@PathVariable Long id) {
         
         Optional<Employee> e = employeeRepository.findById(id);
